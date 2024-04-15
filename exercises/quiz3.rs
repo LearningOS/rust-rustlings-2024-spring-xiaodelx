@@ -16,18 +16,39 @@
 //
 // Execute `rustlings hint quiz3` or use the `hint` watch subcommand for a hint.
 
-// I AM NOT DONE
 
-pub struct ReportCard {
-    pub grade: f32,
+
+
+
+pub trait GradeDisplay {
+    fn grade_display(&self) -> String;
+}
+
+// 为 f32 类型实现 GradeDisplay trait
+impl GradeDisplay for f32 {
+    fn grade_display(&self) -> String {
+        self.to_string()
+    }
+}
+
+// 为 &str 类型实现 GradeDisplay trait
+impl GradeDisplay for &str {
+    fn grade_display(&self) -> String {
+        self.to_string()
+    }
+}
+
+// 修改 ReportCard 结构体，使用泛型 T 并约束 T 实现 GradeDisplay trait
+pub struct ReportCard<T: GradeDisplay> {
+    pub grade: T,
     pub student_name: String,
     pub student_age: u8,
 }
 
-impl ReportCard {
+impl<T: GradeDisplay> ReportCard<T> {
     pub fn print(&self) -> String {
         format!("{} ({}) - achieved a grade of {}",
-            &self.student_name, &self.student_age, &self.grade)
+            &self.student_name, &self.student_age, self.grade.grade_display())
     }
 }
 
@@ -52,7 +73,7 @@ mod tests {
     fn generate_alphabetic_report_card() {
         // TODO: Make sure to change the grade here after you finish the exercise.
         let report_card = ReportCard {
-            grade: 2.1,
+            grade: "A+",
             student_name: "Gary Plotter".to_string(),
             student_age: 11,
         };
