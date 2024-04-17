@@ -2,7 +2,6 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,7 +36,26 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.count += 1;
+        self.items.push(value);
+        self.sift_up(self.count);
+    }
+    fn swap(&mut self, i: usize, j: usize) {
+        self.items.swap(i, j);
+    }
+
+    // Sift up an element at the given index
+    fn sift_up(&mut self, mut idx: usize) {
+        while idx > 1 {
+            let parent_idx = self.parent_idx(idx);
+            if (self.comparator)(&self.items[idx], &self.items[parent_idx]) {
+                // Swap the elements if the child is smaller (for min heap)
+                self.swap(idx, parent_idx);
+                idx = parent_idx;
+            } else {
+                break; // Heap property is satisfied
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,9 +75,15 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let left_idx = self.left_child_idx(idx);
+        let right_idx = self.right_child_idx(idx);
+        if right_idx > self.count || (self.comparator)(&self.items[left_idx], &self.items[right_idx]) {
+            left_idx
+        } else {
+            right_idx
+        }
     }
+    
 }
 
 impl<T> Heap<T>
@@ -84,8 +108,23 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.is_empty() {
+            None
+        } else {
+            let min = self.items.swap_remove(1);
+            self.count -= 1;
+            let mut idx = 1;
+            while self.children_present(idx) {
+                let smaller_child_idx = self.smallest_child_idx(idx);
+                if (self.comparator)(&self.items[smaller_child_idx], &self.items[idx]) {
+                    self.items.swap(idx, smaller_child_idx);
+                    idx = smaller_child_idx;
+                } else {
+                    break;
+                }
+            }
+            Some(min)
+        }
     }
 }
 
